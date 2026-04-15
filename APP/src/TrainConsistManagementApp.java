@@ -1,34 +1,36 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management App - UC2 ===");
+        System.out.println("=== Train Consist Management App - UC3 ===");
 
-        // 1. Create an ArrayList<String> for passenger bogies.
-        // Using String type temporarily to represent the bogies.
-        List<String> passengerBogies = new ArrayList<>();
+        // 1. Create a HashSet<String> for bogie IDs.
+        // The Set interface ensures no duplicate elements can exist in the collection.
+        Set<String> bogieIds = new HashSet<>();
 
-        // 2. Add bogies: Sleeper, AC Chair, First Class.
-        // The add() method appends elements in the order they are inserted.
-        passengerBogies.add("Sleeper");
-        passengerBogies.add("AC Chair");
-        passengerBogies.add("First Class");
+        System.out.println("Registering Bogie IDs for the consist...");
 
-        // 3. Print the list after insertion.
-        System.out.println("Initial Passenger Bogies attached: " + passengerBogies);
+        // 2. Add values, intentionally including a duplicate.
+        // We can capture the boolean return value of add() to see if the insertion was successful.
+        boolean isBg101Added = bogieIds.add("BG101");
+        System.out.println("Attempting to add BG101... Success: " + isBg101Added);
 
-        // 4. Remove one bogie (AC Chair).
-        System.out.println("\nDetaching 'AC Chair' bogie...");
-        passengerBogies.remove("AC Chair");
+        boolean isBg102Added = bogieIds.add("BG102");
+        System.out.println("Attempting to add BG102... Success: " + isBg102Added);
 
-        // 5. Use contains() to check if Sleeper exists.
-        boolean hasSleeper = passengerBogies.contains("Sleeper");
-        System.out.println("Safety Check: Is the 'Sleeper' bogie still attached? " + hasSleeper);
+        // Intentionally adding a duplicate ID
+        boolean isDuplicateAdded = bogieIds.add("BG101");
+        System.out.println("Attempting to add BG101 again... Success: " + isDuplicateAdded);
 
-        // 6. Print final list state.
-        System.out.println("\nFinal Consist State: " + passengerBogies);
+        boolean isBg103Added = bogieIds.add("BG103");
+        System.out.println("Attempting to add BG103... Success: " + isBg103Added);
+
+        // 3. Print the final set to observe the state.
+        // Notice that the duplicate "BG101" is completely ignored, and the output order
+        // may not match the insertion order because HashSet is unordered.
+        System.out.println("\nFinal Registered Unique Bogie IDs: " + bogieIds);
         System.out.println("Program continues...");
     }
 }
