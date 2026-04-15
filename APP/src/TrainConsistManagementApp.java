@@ -1,33 +1,38 @@
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management App - UC5 ===");
+        System.out.println("=== Train Consist Management App - UC6 ===");
 
-        // 1. Create a LinkedHashSet<String> to represent the train formation.
-        // LinkedHashSet combines the uniqueness of a Set with the ordering of a LinkedList.
-        Set<String> trainFormation = new LinkedHashSet<>();
+        // 1. Create a HashMap<String, Integer> to store bogie-capacity information.
+        // We use the Map interface to define a Key-Value relationship.
+        Map<String, Integer> bogieCapacityMap = new HashMap<>();
 
-        System.out.println("Attaching bogies to the engine...");
+        System.out.println("Registering Bogie Capacities...");
 
-        // 2. Attach bogies: Engine, Sleeper, Cargo, Guard.
-        trainFormation.add("Engine");
-        trainFormation.add("Sleeper");
-        trainFormation.add("Cargo");
-        trainFormation.add("Guard");
+        // 2 & 3. Insert capacity values using the put() method.
+        // The Key (String) must be unique. The Value (Integer) is the capacity.
+        bogieCapacityMap.put("Sleeper", 72);
+        bogieCapacityMap.put("AC Chair", 78);
+        bogieCapacityMap.put("First Class", 24);
+        bogieCapacityMap.put("Cargo (Rectangular)", 50); // Assuming 50 tons for goods
 
-        // 3. Attempt to attach a duplicate bogie intentionally (Sleeper again).
-        System.out.println("\nAlert: Accidental duplicate attachment detected in yard!");
-        boolean isDuplicateAdded = trainFormation.add("Sleeper");
+        // 4. Iterate over the map using entrySet().
+        // entrySet() returns a Set of Map.Entry objects, allowing us to access both key and value simultaneously.
+        System.out.println("\n--- Bogie Capacity Details ---");
+        for (Map.Entry<String, Integer> entry : bogieCapacityMap.entrySet()) {
+            String bogieType = entry.getKey();
+            Integer capacity = entry.getValue();
 
-        System.out.println("Attempting to attach duplicate 'Sleeper'... Success: " + isDuplicateAdded);
+            // 5. Display each bogie along with its corresponding capacity.
+            System.out.println("Bogie Type: " + bogieType + " | Capacity: " + capacity);
+        }
 
-        // 4. Display the final formation order.
-        // The output will show the exact physical attachment sequence, without the duplicate.
-        System.out.println("\nFinal Verified Train Formation: ");
-        System.out.println(trainFormation);
+        // Demonstrating fast lookup (O(1) time complexity)
+        System.out.println("\nQuick Lookup Check:");
+        System.out.println("Capacity for 'Sleeper' is: " + bogieCapacityMap.get("Sleeper"));
 
         System.out.println("\nProgram continues...");
     }
