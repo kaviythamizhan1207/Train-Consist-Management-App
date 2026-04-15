@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 // 1. Reusing the Bogie class
 class Bogie {
@@ -23,65 +21,53 @@ class Bogie {
 
     @Override
     public String toString() {
-        return "[Bogie: " + name + ", Capacity: " + capacity + "]";
+        return "[Bogie: " + name + " | Seats: " + capacity + "]";
     }
 }
 
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management App - UC9 ===");
+        System.out.println("=== Train Consist Management App - UC10 ===");
 
-        // 2. Create a list of bogies, intentionally adding multiples of the same type
-        // to demonstrate grouping behavior (testGrouping_MultipleBogiesInSameGroup).
-        List<Bogie> trainConsist = new ArrayList<>();
-        trainConsist.add(new Bogie("Sleeper", 72));
-        trainConsist.add(new Bogie("Sleeper", 72));       // 2nd Sleeper
-        trainConsist.add(new Bogie("AC Chair", 56));
-        trainConsist.add(new Bogie("First Class", 24));
-        trainConsist.add(new Bogie("Cargo (Goods)", 50));
-        trainConsist.add(new Bogie("Cargo (Goods)", 80)); // 2nd Cargo
+        // 2. Create a list of passenger bogies.
+        List<Bogie> passengerBogies = new ArrayList<>();
+        passengerBogies.add(new Bogie("Sleeper", 72));
+        passengerBogies.add(new Bogie("AC Chair", 56));
+        passengerBogies.add(new Bogie("First Class", 24));
+        passengerBogies.add(new Bogie("General Second Class", 90));
 
-        System.out.println("--- Flat List (Uncategorized) ---");
-        System.out.println("Total Bogies: " + trainConsist.size());
+        System.out.println("--- Current Passenger Consist ---");
+        passengerBogies.forEach(System.out::println);
 
-        // 3. Call the modular grouping method
-        System.out.println("\nApplying Stream Collectors.groupingBy()...");
-        Map<String, List<Bogie>> groupedBogies = groupBogiesByType(trainConsist);
+        // 3. Perform the aggregation
+        System.out.println("\nCalculating total seating capacity using Stream map() and reduce()...");
+        int totalSeats = calculateTotalCapacity(passengerBogies);
 
-        // 4. Display the structured, grouped result
-        System.out.println("\n--- Grouped Bogies Structured Report ---");
-        if (groupedBogies.isEmpty()) {
-            System.out.println("No bogies to group.");
-        } else {
-            // Iterate over the Map entries to show categories and their lists
-            groupedBogies.forEach((category, bogieList) -> {
-                System.out.println("Category: " + category + " (Count: " + bogieList.size() + ")");
-                for (Bogie b : bogieList) {
-                    System.out.println("   -> " + b);
-                }
-            });
-        }
+        // 4. Display the total seating capacity.
+        System.out.println("\n*** TOTAL TRAIN SEATING CAPACITY: " + totalSeats + " seats ***");
 
-        // 5. Verify Original Collection Integrity (testGrouping_OriginalListUnchanged)
+        // 5. Verify Original Collection Integrity (testReduce_OriginalListUnchanged)
         System.out.println("\n--- Verification: Original List Integrity ---");
-        System.out.println("Original list size: " + trainConsist.size() + " (Remains unchanged)");
+        System.out.println("Original list size: " + passengerBogies.size() + " (Remains unchanged)");
 
         System.out.println("\nProgram continues...");
     }
 
     /**
-     * Groups a list of bogies by their type/name.
-     * This method is pure and does not modify the original list, making it
-     * ideal for the required JUnit test cases.
+     * Calculates the total capacity of a list of bogies.
+     * This method is pure, does not modify the original list, and safely handles empty collections,
+     * making it perfectly suited for the required JUnit test cases.
      *
-     * @param bogies The flat list of bogies to be grouped.
-     * @return A Map where the key is the Bogie name and the value is a List of matching Bogies.
+     * @param bogies The list of bogies to aggregate.
+     * @return The total sum of all bogie capacities.
      */
-    public static Map<String, List<Bogie>> groupBogiesByType(List<Bogie> bogies) {
+    public static int calculateTotalCapacity(List<Bogie> bogies) {
         return bogies.stream()
-                // The groupingBy collector uses the classifier function (Bogie::getName)
-                // to determine the map keys. It automatically aggregates matching elements into a List.
-                .collect(Collectors.groupingBy(Bogie::getName));
+                // Step A: Transform the stream of Bogie objects into a stream of Integers (Capacity)
+                .map(b -> b.getCapacity())
+                // Step B: Aggregate the integers.
+                // 0 is the identity (starting value). Integer::sum is the accumulator function.
+                .reduce(0, Integer::sum);
     }
 }
