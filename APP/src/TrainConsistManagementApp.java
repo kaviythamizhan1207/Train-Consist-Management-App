@@ -1,73 +1,76 @@
-import java.util.ArrayList;
-import java.util.List;
-
-// 1. Reusing the Bogie class
-class Bogie {
-    private String name;
-    private int capacity;
-
-    public Bogie(String name, int capacity) {
-        this.name = name;
-        this.capacity = capacity;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    @Override
-    public String toString() {
-        return "[Bogie: " + name + " | Seats: " + capacity + "]";
-    }
-}
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TrainConsistManagementApp {
 
+    // 1. Compile patterns using the Pattern class.
+    // Compiling these at the class level ensures they are only compiled once, which is a performance best practice.
+    private static final Pattern TRAIN_ID_PATTERN = Pattern.compile("TRN-\\d{4}");
+    private static final Pattern CARGO_CODE_PATTERN = Pattern.compile("PET-[A-Z]{2}");
+
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management App - UC10 ===");
+        System.out.println("=== Train Consist Management App - UC11 ===");
 
-        // 2. Create a list of passenger bogies.
-        List<Bogie> passengerBogies = new ArrayList<>();
-        passengerBogies.add(new Bogie("Sleeper", 72));
-        passengerBogies.add(new Bogie("AC Chair", 56));
-        passengerBogies.add(new Bogie("First Class", 24));
-        passengerBogies.add(new Bogie("General Second Class", 90));
+        // Test Scenarios based on your Flow
+        String validTrainId = "TRN-1234";
+        String invalidTrainId = "TRAIN12";
 
-        System.out.println("--- Current Passenger Consist ---");
-        passengerBogies.forEach(System.out::println);
+        String validCargoCode = "PET-AB";
+        String invalidCargoCode = "PET-ab"; // Lowercase, should fail
 
-        // 3. Perform the aggregation
-        System.out.println("\nCalculating total seating capacity using Stream map() and reduce()...");
-        int totalSeats = calculateTotalCapacity(passengerBogies);
+        System.out.println("--- Validating Train IDs ---");
+        displayValidationResult("Train ID", validTrainId, isValidTrainId(validTrainId));
+        displayValidationResult("Train ID", invalidTrainId, isValidTrainId(invalidTrainId));
 
-        // 4. Display the total seating capacity.
-        System.out.println("\n*** TOTAL TRAIN SEATING CAPACITY: " + totalSeats + " seats ***");
-
-        // 5. Verify Original Collection Integrity (testReduce_OriginalListUnchanged)
-        System.out.println("\n--- Verification: Original List Integrity ---");
-        System.out.println("Original list size: " + passengerBogies.size() + " (Remains unchanged)");
+        System.out.println("\n--- Validating Cargo Codes ---");
+        displayValidationResult("Cargo Code", validCargoCode, isValidCargoCode(validCargoCode));
+        displayValidationResult("Cargo Code", invalidCargoCode, isValidCargoCode(invalidCargoCode));
 
         System.out.println("\nProgram continues...");
     }
 
     /**
-     * Calculates the total capacity of a list of bogies.
-     * This method is pure, does not modify the original list, and safely handles empty collections,
-     * making it perfectly suited for the required JUnit test cases.
+     * Validates if the provided Train ID exactly matches the format: TRN-####
+     * This method is pure and perfectly suited for your JUnit test cases.
      *
-     * @param bogies The list of bogies to aggregate.
-     * @return The total sum of all bogie capacities.
+     * @param trainId The input Train ID to validate.
+     * @return true if valid, false otherwise.
      */
-    public static int calculateTotalCapacity(List<Bogie> bogies) {
-        return bogies.stream()
-                // Step A: Transform the stream of Bogie objects into a stream of Integers (Capacity)
-                .map(b -> b.getCapacity())
-                // Step B: Aggregate the integers.
-                // 0 is the identity (starting value). Integer::sum is the accumulator function.
-                .reduce(0, Integer::sum);
+    public static boolean isValidTrainId(String trainId) {
+        // Handle null or empty inputs gracefully (testRegex_EmptyInputHandling)
+        if (trainId == null || trainId.trim().isEmpty()) {
+            return false;
+        }
+
+        // 2. Create Matcher objects for user input.
+        Matcher matcher = TRAIN_ID_PATTERN.matcher(trainId);
+
+        // 3. Use matches() to validate exact input formats (testRegex_ExactPatternMatch).
+        return matcher.matches();
+    }
+
+    /**
+     * Validates if the provided Cargo Code exactly matches the format: PET-XX
+     * Only uppercase letters are permitted for the suffix.
+     *
+     * @param cargoCode The input Cargo Code to validate.
+     * @return true if valid, false otherwise.
+     */
+    public static boolean isValidCargoCode(String cargoCode) {
+        if (cargoCode == null || cargoCode.trim().isEmpty()) {
+            return false;
+        }
+
+        Matcher matcher = CARGO_CODE_PATTERN.matcher(cargoCode);
+        return matcher.matches();
+    }
+
+    // Helper method to keep console output clean
+    private static void displayValidationResult(String type, String input, boolean isValid) {
+        if (isValid) {
+            System.out.println("[ACCEPTED] " + type + " '" + input + "' is formatted correctly.");
+        } else {
+            System.out.println("[REJECTED] " + type + " '" + input + "' failed validation constraints!");
+        }
     }
 }
