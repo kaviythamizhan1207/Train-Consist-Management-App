@@ -1,76 +1,87 @@
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
+// 1. Create a specific class for Goods Bogies with shape and cargo fields.
+class GoodsBogie {
+    private String shape;
+    private String cargo;
+
+    public GoodsBogie(String shape, String cargo) {
+        this.shape = shape;
+        this.cargo = cargo;
+    }
+
+    public String getShape() {
+        return shape;
+    }
+
+    public String getCargo() {
+        return cargo;
+    }
+
+    @Override
+    public String toString() {
+        return "[Shape: " + shape + " | Cargo: " + cargo + "]";
+    }
+}
 
 public class TrainConsistManagementApp {
 
-    // 1. Compile patterns using the Pattern class.
-    // Compiling these at the class level ensures they are only compiled once, which is a performance best practice.
-    private static final Pattern TRAIN_ID_PATTERN = Pattern.compile("TRN-\\d{4}");
-    private static final Pattern CARGO_CODE_PATTERN = Pattern.compile("PET-[A-Z]{2}");
-
     public static void main(String[] args) {
-        System.out.println("=== Train Consist Management App - UC11 ===");
+        System.out.println("=== Train Consist Management App - UC12 ===");
 
-        // Test Scenarios based on your Flow
-        String validTrainId = "TRN-1234";
-        String invalidTrainId = "TRAIN12";
+        // --- Scenario 1: A Valid, Safe Train Formation ---
+        List<GoodsBogie> safeTrain = new ArrayList<>();
+        safeTrain.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        safeTrain.add(new GoodsBogie("Rectangular", "Coal"));
+        safeTrain.add(new GoodsBogie("Open", "Steel"));
 
-        String validCargoCode = "PET-AB";
-        String invalidCargoCode = "PET-ab"; // Lowercase, should fail
+        System.out.println("--- Verifying Train 1 (Safe Formation) ---");
+        safeTrain.forEach(System.out::println);
+        boolean isTrain1Safe = isSafetyCompliant(safeTrain);
+        displaySafetyResult(isTrain1Safe);
 
-        System.out.println("--- Validating Train IDs ---");
-        displayValidationResult("Train ID", validTrainId, isValidTrainId(validTrainId));
-        displayValidationResult("Train ID", invalidTrainId, isValidTrainId(invalidTrainId));
+        // --- Scenario 2: An Invalid, Unsafe Train Formation ---
+        List<GoodsBogie> unsafeTrain = new ArrayList<>();
+        unsafeTrain.add(new GoodsBogie("Rectangular", "Grain"));
+        unsafeTrain.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        unsafeTrain.add(new GoodsBogie("Cylindrical", "Coal")); // SAFETY VIOLATION! Coal in a cylindrical bogie.
 
-        System.out.println("\n--- Validating Cargo Codes ---");
-        displayValidationResult("Cargo Code", validCargoCode, isValidCargoCode(validCargoCode));
-        displayValidationResult("Cargo Code", invalidCargoCode, isValidCargoCode(invalidCargoCode));
+        System.out.println("\n--- Verifying Train 2 (Unsafe Formation) ---");
+        unsafeTrain.forEach(System.out::println);
+        boolean isTrain2Safe = isSafetyCompliant(unsafeTrain);
+        displaySafetyResult(isTrain2Safe);
 
         System.out.println("\nProgram continues...");
     }
 
     /**
-     * Validates if the provided Train ID exactly matches the format: TRN-####
+     * Validates whether the entire train formation complies with safety rules.
+     * Rule: Cylindrical bogies must ONLY carry Petroleum.
      * This method is pure and perfectly suited for your JUnit test cases.
      *
-     * @param trainId The input Train ID to validate.
-     * @return true if valid, false otherwise.
+     * @param bogies The list of goods bogies to check.
+     * @return true if ALL bogies pass the safety check, false otherwise.
      */
-    public static boolean isValidTrainId(String trainId) {
-        // Handle null or empty inputs gracefully (testRegex_EmptyInputHandling)
-        if (trainId == null || trainId.trim().isEmpty()) {
-            return false;
-        }
-
-        // 2. Create Matcher objects for user input.
-        Matcher matcher = TRAIN_ID_PATTERN.matcher(trainId);
-
-        // 3. Use matches() to validate exact input formats (testRegex_ExactPatternMatch).
-        return matcher.matches();
-    }
-
-    /**
-     * Validates if the provided Cargo Code exactly matches the format: PET-XX
-     * Only uppercase letters are permitted for the suffix.
-     *
-     * @param cargoCode The input Cargo Code to validate.
-     * @return true if valid, false otherwise.
-     */
-    public static boolean isValidCargoCode(String cargoCode) {
-        if (cargoCode == null || cargoCode.trim().isEmpty()) {
-            return false;
-        }
-
-        Matcher matcher = CARGO_CODE_PATTERN.matcher(cargoCode);
-        return matcher.matches();
+    public static boolean isSafetyCompliant(List<GoodsBogie> bogies) {
+        return bogies.stream()
+                // allMatch evaluates every element. If even one returns false, the whole expression is false.
+                .allMatch(bogie -> {
+                    // Conditional Logic: If it is Cylindrical, cargo MUST be Petroleum.
+                    if (bogie.getShape().equalsIgnoreCase("Cylindrical")) {
+                        return bogie.getCargo().equalsIgnoreCase("Petroleum");
+                    }
+                    // For non-cylindrical bogies (like Rectangular, Open), any cargo is allowed.
+                    return true;
+                });
     }
 
     // Helper method to keep console output clean
-    private static void displayValidationResult(String type, String input, boolean isValid) {
-        if (isValid) {
-            System.out.println("[ACCEPTED] " + type + " '" + input + "' is formatted correctly.");
+    private static void displaySafetyResult(boolean isSafe) {
+        if (isSafe) {
+            System.out.println(">>> RESULT: [SAFE] Train is compliant and ready for departure.");
         } else {
-            System.out.println("[REJECTED] " + type + " '" + input + "' failed validation constraints!");
+            System.out.println(">>> RESULT: [UNSAFE] Compliance violation detected! Train formation rejected.");
         }
     }
 }
