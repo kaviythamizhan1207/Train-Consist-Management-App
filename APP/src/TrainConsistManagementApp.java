@@ -4,18 +4,31 @@ import java.util.List;
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        // 1. Application prints welcome message
-        System.out.println("=== Train Consist Management App ===");
+        System.out.println("=== Train Consist Management App - UC2 ===");
 
-        // 2. Train consist is initialized
-        // Using List interface and ArrayList implementation for dynamic sizing.
-        // We use 'Object' as a placeholder generic type until specific Bogie classes are created in future use cases.
-        List<Object> trainConsist = new ArrayList<>();
+        // 1. Create an ArrayList<String> for passenger bogies.
+        // Using String type temporarily to represent the bogies.
+        List<String> passengerBogies = new ArrayList<>();
 
-        // 3. Initial bogie count is displayed
-        System.out.println("Initial bogie count: " + trainConsist.size());
+        // 2. Add bogies: Sleeper, AC Chair, First Class.
+        // The add() method appends elements in the order they are inserted.
+        passengerBogies.add("Sleeper");
+        passengerBogies.add("AC Chair");
+        passengerBogies.add("First Class");
 
-        // 4. Program continues
+        // 3. Print the list after insertion.
+        System.out.println("Initial Passenger Bogies attached: " + passengerBogies);
+
+        // 4. Remove one bogie (AC Chair).
+        System.out.println("\nDetaching 'AC Chair' bogie...");
+        passengerBogies.remove("AC Chair");
+
+        // 5. Use contains() to check if Sleeper exists.
+        boolean hasSleeper = passengerBogies.contains("Sleeper");
+        System.out.println("Safety Check: Is the 'Sleeper' bogie still attached? " + hasSleeper);
+
+        // 6. Print final list state.
+        System.out.println("\nFinal Consist State: " + passengerBogies);
         System.out.println("Program continues...");
     }
 }
